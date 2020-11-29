@@ -2,6 +2,7 @@ import sys, os, re
 from flask import Flask, render_template, request
 from pymongo import MongoClient
 from bson import json_util
+from cassandra.cluster import Cluster
 
 # Configuration details
 import config
@@ -13,6 +14,9 @@ import predict_utils
 app = Flask(__name__)
 
 client = MongoClient(host='mongo')
+
+cluster = Cluster(["cassandra"])
+cassandra_session = cluster.connect()
 
 from pyelasticsearch import ElasticSearch
 elastic = ElasticSearch(config.ELASTIC_URL)
@@ -471,7 +475,7 @@ def classify_flight_delays_realtime():
   
   # Set the derived values
   prediction_features['Distance'] = predict_utils.get_flight_distance(
-    client, api_form_values['Origin'],
+    cassandra_session, api_form_values['Origin'],
     api_form_values['Dest']
   )
   

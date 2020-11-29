@@ -4,5 +4,8 @@ ENV PROJECT_HOME=/usr/src/app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY web/ ./web/
+COPY import_distances.py ./
+COPY start.sh ./
 EXPOSE 5000
-CMD [ "python", "./web/predict_flask.py" ]
+ENTRYPOINT [ "bash" ]
+CMD [ "./start.sh" ]

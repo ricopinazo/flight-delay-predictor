@@ -31,14 +31,19 @@ def strip_place(url):
     return url
   return p
 
-def get_flight_distance(client, origin, dest):
+def get_flight_distance(cassandra_session, origin, dest):
   """Get the distance between a pair of airport codes"""
-  query = {
-    "Origin": origin,
-    "Dest": dest,
-  }
-  record = client.agile_data_science.origin_dest_distances.find_one(query)
-  return record["Distance"]
+
+  record = cassandra_session.execute(
+    """
+    SELECT Distance FROM agile_data_science.origin_dest_distances
+    WHERE Origin=%s AND Dest=%s
+    LIMIT 1
+    ALLOW FILTERING
+    """,
+    (origin, dest)
+  ).one()
+  return record.distance
 
 def get_regression_date_args(iso_date):
   """Given an ISO Date, return the day of year, day of month, day of week as the API expects them."""

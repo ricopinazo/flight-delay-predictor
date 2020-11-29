@@ -23,6 +23,10 @@ services:
     build: ./mongo
     hostname: mongo
     container_name: fdp-mongo
+  cassandra:
+    image: cassandra:3.11.9
+    hostname: cassandra
+    container_name: fdp-cassandra
   flask:
     build: ./flask
     hostname: flask
@@ -30,6 +34,7 @@ services:
     depends_on:
       - kafka
       - mongo
+      - cassandra
     ports:
       - "5000:5000"
   spark-master:
