@@ -1,8 +1,10 @@
 import sys, os, re
+import time
 from flask import Flask, render_template, request
 from pymongo import MongoClient
 from bson import json_util
 from cassandra.cluster import Cluster
+from cassandra.cluster import NoHostAvailable
 
 # Configuration details
 import config
@@ -13,10 +15,15 @@ import predict_utils
 # Set up Flask, Mongo and Elasticsearch
 app = Flask(__name__)
 
-client = MongoClient(host='mongo')
-
-cluster = Cluster(["cassandra"])
-cassandra_session = cluster.connect()
+success=False
+while not success:
+  try:
+    cassandra_session = Cluster(["cassandra"]).connect()
+    success=True
+  except NoHostAvailable as e:
+    print(e)
+    print("Retrying...")
+    time.sleep(2)
 
 from pyelasticsearch import ElasticSearch
 elastic = ElasticSearch(config.ELASTIC_URL)
@@ -516,18 +523,20 @@ def flight_delays_page_kafka():
 @app.route("/flights/delays/predict/classify_realtime/response/<unique_id>")
 def classify_flight_delays_realtime_response(unique_id):
   """Serves predictions to polling requestors"""
-  
-  prediction = client.agile_data_science.flight_delay_classification_response.find_one(
-    {
-      "UUID": unique_id
-    }
-  )
-  
+
+  print(unique_id, " -> type: ", type(unique_id))
+
+  query = """
+    SELECT "Prediction" FROM agile_data_science.flight_delay_classification_response
+    WHERE "UUID"={}
+    """.format(unique_id)
+  record = cassandra_session.execute(query).one()
+
   response = {"status": "WAIT", "id": unique_id}
-  if prediction:
+  if record:
     response["status"] = "OK"
-    response["prediction"] = prediction
-  
+    response["prediction"] = record.Prediction
+
   return json_util.dumps(response)
 
 def shutdown_server():

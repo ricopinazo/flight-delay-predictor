@@ -6,6 +6,7 @@ fi
 
 spark-submit \
   --class "es.upm.dit.ging.predictor.MakePrediction" \
-  --packages org.mongodb.spark:mongo-spark-connector_2.11:2.3.2,org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.0 \
+  --packages com.datastax.spark:spark-cassandra-connector_2.11:2.4.2,org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.0 \
+  --conf spark.cassandra.connection.host=cassandra \
   /flight_prediction_2.11-0.1.jar \
   "${SPARK_MASTER_URL}"

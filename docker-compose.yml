@@ -19,12 +19,8 @@ services:
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
     depends_on:
       - zookeeper
-  mongo:
-    build: ./mongo
-    hostname: mongo
-    container_name: fdp-mongo
   cassandra:
-    image: cassandra:3.11.9
+    build: ./cassandra
     hostname: cassandra
     container_name: fdp-cassandra
   flask:
@@ -33,7 +29,6 @@ services:
     container_name: fdp-flask
     depends_on:
       - kafka
-      - mongo
       - cassandra
     ports:
       - "5000:5000"
@@ -61,8 +56,6 @@ services:
       SPARK_MASTER_URL: spark://spark-master:7077
     depends_on:
       - kafka
-      - mongo
+      - cassandra
       - spark-master
       - spark-worker
-volumes:
-  models:

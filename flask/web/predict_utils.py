@@ -34,16 +34,34 @@ def strip_place(url):
 def get_flight_distance(cassandra_session, origin, dest):
   """Get the distance between a pair of airport codes"""
 
-  record = cassandra_session.execute(
-    """
-    SELECT Distance FROM agile_data_science.origin_dest_distances
-    WHERE Origin=%s AND Dest=%s
+  # query = cassandra_session.prepare(
+  #   """
+  #   SELECT "Distance" FROM agile_data_science.origin_dest_distances
+  #   WHERE "Origin"=? AND "Dest"=?
+  #   LIMIT 1
+  #   ALLOW FILTERING;
+  #   """
+  # )
+
+  # record = cassandra_session.execute(#query, [origin, dest]).one()
+  #   """
+  #   SELECT "Distance" FROM agile_data_science.origin_dest_distances
+  #   WHERE "Origin"='ATL' AND "Dest"='SFO'
+  #   LIMIT 1
+  #   ALLOW FILTERING
+  #   """#,
+  #   #(origin, dest)
+  # ).one()
+
+  query = """
+    SELECT "Distance" FROM agile_data_science.origin_dest_distances
+    WHERE "Origin"='{}' AND "Dest"='{}'
     LIMIT 1
     ALLOW FILTERING
-    """,
-    (origin, dest)
-  ).one()
-  return record.distance
+    """.format(origin, dest)
+  record = cassandra_session.execute(query).one()
+
+  return record.Distance
 
 def get_regression_date_args(iso_date):
   """Given an ISO Date, return the day of year, day of month, day of week as the API expects them."""

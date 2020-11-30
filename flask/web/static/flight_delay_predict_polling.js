@@ -65,19 +65,19 @@ function renderPage(response) {
 
   var displayMessage;
 
-if(response.Prediction == 0 || response.Prediction == '0') {
+if(response == 0 || response == '0.0') {
     displayMessage = "Early (15+ Minutes Early)";
   }
-  else if(response.Prediction == 1 || response.Prediction == '1') {
+  else if(response == 1 || response == '1.0') {
     displayMessage = "Slightly Early (0-15 Minute Early)";
   }
-  else if(response.Prediction == 2 || response.Prediction == '2') {
+  else if(response == 2 || response == '2.0') {
     displayMessage = "Slightly Late (0-30 Minute Delay)";
   }
-  else if(response.Prediction == 3 || response.Prediction == '3') {
+  else if(response == 3 || response == '3.0') {
     displayMessage = "Very Late (30+ Minutes Late)";
   }
-  
+
   console.log(displayMessage)
 
   $( "#result" ).empty().append( displayMessage );

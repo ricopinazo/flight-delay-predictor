@@ -1,12 +1,12 @@
 package es.upm.dit.ging.predictor
 
-import com.mongodb.spark.MongoSpark
-import com.mongodb.spark.config.WriteConfig
+import org.apache.spark.sql.cassandra._
 import org.apache.spark.ml.classification.RandomForestClassificationModel
 import org.apache.spark.ml.feature.{Bucketizer, StringIndexerModel, VectorAssembler}
 import org.apache.spark.sql.functions.{concat, from_json, lit}
 import org.apache.spark.sql.types.{DataTypes, StructType}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.streaming.OutputMode
 
 object MakePrediction {
 
@@ -17,6 +17,7 @@ object MakePrediction {
       .builder
       .appName("StructuredNetworkWordCount")
       .master(args(0))
+      .config("spark.cassandra.connection.host", "cassandra")
       .getOrCreate()
     import spark.implicits._
 
@@ -138,14 +139,15 @@ object MakePrediction {
     // Inspect the output
     finalPredictions.printSchema()
 
-    // Define MongoUri for connection
-    val writeConfig = WriteConfig(Map("uri" -> "mongodb://mongo:27017/agile_data_science.flight_delay_classification_response"))
-
-    // Store to Mongo each streaming batch
     val flightRecommendations = finalPredictions.writeStream.foreachBatch {
-      (batchDF: DataFrame, batchId: Long) =>
-        MongoSpark.save(batchDF,writeConfig)
-    }.start()
+      (batchDF, _) =>
+        batchDF
+          .select("UUID", "Prediction")
+          .write
+          .cassandraFormat("flight_delay_classification_response", "agile_data_science")
+          .mode("append")
+          .save
+    }.start
 
     // Console Output for predictions
     val consoleOutput = finalPredictions.writeStream
