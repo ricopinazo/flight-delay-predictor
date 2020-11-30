@@ -219,7 +219,6 @@ def airline(carrier_code):
   )
 
 # Controller: Fetch an airplane entity page
-@app.route("/")
 @app.route("/airlines")
 @app.route("/airlines/")
 def airlines():
@@ -506,6 +505,7 @@ def classify_flight_delays_realtime():
   response = {"status": "OK", "id": unique_id}
   return json_util.dumps(response)
 
+@app.route("/")
 @app.route("/flights/delays/predict_kafka")
 def flight_delays_page_kafka():
   """Serves flight delay prediction page with polling form"""
