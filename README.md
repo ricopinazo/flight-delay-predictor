@@ -1,16 +1,16 @@
-# Big Data
+# Flight Delay Predictor
 
-*Authors: Alejandro Pérez Parra, Morad Ghaillane Ghailan, Pedro Rico Pinazo*
+*Autores: Alejandro Pérez Parra, Morad Ghaillane Ghailan, Pedro Rico Pinazo*
 
-Se ha realizado la práctica sobre Docker-Compose, modificado la base de datos a Cassandra y desplegado en Google Cloud. El programa de predicción es enviado mediante spark-submit a un cluster de Spark formado por un master y un worker.
+El proyecto de este repositorio está basado en: https://github.com/ging/practica_big_data_2019
 
-El entrenamiento de los modelos y la compilación del proyecto de scala se lleva a cabo en la propia generación de las imágenes Docker.
+El despliegue del servicio se ha llevado a cabo mediante Docker-Compose sobre [Google Compute Engine](https://cloud.google.com/compute), empleando [Apache Cassandra](https://cassandra.apache.org/) para sustituir el papel de Mongo. El programa de predicción se envía mediante `spark-submit` a un cluster de Spark formado por un master y un worker.
 
-Repositorio GitHub:
-https://github.com/ricopinazo/flight-delay-predictor.git
+El entrenamiento de los modelos y la compilación del proyecto de Scala se lleva a cabo en la propia generación de las imágenes Docker.
 
-Enlace a video despliegue en Google Cloud:
-https://upm365-my.sharepoint.com/:v:/g/personal/a_pparra_alumnos_upm_es/EZz9Dxm9RLBOvMNTR-7Zp5IBwV0GEmdtfGMDpIHmd0962A?e=thxn4U
+Enlaces:
+- [Repositorio de GitHub](https://github.com/ricopinazo/flight-delay-predictor)
+- [Vídeo del despliegue en Google Cloud](https://upm365-my.sharepoint.com/:v:/g/personal/a_pparra_alumnos_upm_es/EZz9Dxm9RLBOvMNTR-7Zp5IBwV0GEmdtfGMDpIHmd0962A?e=thxn4U)
 
 ## Instrucciones:
 
@@ -25,14 +25,14 @@ cd flight-delay-predictor
 docker-compose up -d
 ```
 
-- Acceder al navegador a calquiera de los dos enlaces
-    - http://localhost:5000
+- Acceder en el navegador a calquiera de los dos enlaces
+    - http://localhost:5000/
     - http://localhost:5000/flights/delays/predict_kafka
 
 ## Ejecución en Google Cloud:
 
-Inicializar una nueva instancia de Compute Engine, en Disco de arranque elegir como sistema operativo "Container Optimized OS".
-Una vez arrancada la instancia ejecutar:
+Inicializar una nueva instancia de Compute Engine eligiendo en Disco de arranque como sistema operativo ["Container Optimized OS"](https://cloud.google.com/container-optimized-os).
+Una vez arrancada la instancia:
 
 - Clonar el repositorio
 ```bash
@@ -45,7 +45,7 @@ cd flight-delay-predictor
 docker run docker/compose version
 ```
 
-- Realizar el docker-compose a traves de la imagen de Docker Compose
+- Ejecutar `docker-compose` a través de la imagen de Docker Compose
 ```bash
 docker run --rm \
     -v /var/run/docker.sock:/var/run/docker.sock \
@@ -54,7 +54,7 @@ docker run --rm \
     docker/compose up -d
 ```
 
-- Acceder a la consola de Google, configurar el firewall para que acepte conexiones con el puerto 5000 y copiar la IP pública de ma VM. Introducir en el navegador:
+- Acceder a la consola de Google, configurar el firewall para que acepte conexiones con el puerto 5000 y copiar la IP pública de la VM. Introducir en el navegador:
     - http://publicGoogleIP:5000/
 
 
